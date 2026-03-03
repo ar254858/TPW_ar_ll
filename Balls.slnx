@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/MyProject/">
+    <Project Path="BusinessLogic/BusinessLogic.csproj" Id="962c4fea-f708-4c6d-ba9e-385a0d206985" />
+    <Project Path="BusinessLogicTest/BusinessLogicTest.csproj" Id="82567873-50d9-460f-8276-5a3925e30843" />
+    <Project Path="Data/Data.csproj" Id="47eb9cd3-7c0a-45f3-a01a-33d883b1ebca" />
+    <Project Path="DataTest/DataTest.csproj" Id="5cc8c3d8-2166-43c9-9e4c-f654b451deb4" />
+    <Project Path="PresentationModel/PresentationModel.csproj" Id="3ea71b55-072c-43ef-8ac8-7d7418e83f6d" />
+    <Project Path="PresentationModelTest/PresentationModelTest.csproj" Id="59a127f9-83d5-445c-863a-685d63b66aa7" />
+    <Project Path="PresentationView/PresentationView.csproj" Id="dc0702ce-062b-46e3-a2dd-15d6e57b5fcd" />
+    <Project Path="PresentationViewModel/PresentationViewModel.csproj" Id="c4eba9ff-2bec-40e6-806b-4be6374af7aa" />
+    <Project Path="PresentationViewModelTest/PresentationViewModelTest.csproj" Id="784a058e-a39f-4c14-a1a3-3251e81e85ea" />
+  </Folder>
+</Solution>
