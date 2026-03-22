@@ -1,4 +1,5 @@
 ﻿using BusinessLogic;
+using Data;
 
 namespace BusinessLogicTest
 {
@@ -8,13 +9,10 @@ namespace BusinessLogicTest
         [TestMethod]
         public void TestMethod1()
         {
-            Class1 class_test = new Class1();
-            int a = 10;
-            int b = 20;
-            int expected = 30;
-
-            int result = class_test.add(a, b);
-            Assert.AreEqual(expected, result);
+            BallLogic ballLogic = new();
+            ballLogic.CreateBalls(1);
+            Assert.HasCount(1, ballLogic.Balls);
+            Assert.AreEqual(typeof(Ball), ballLogic.Balls.ElementAt(0).GetType());
         }
     }
 }
