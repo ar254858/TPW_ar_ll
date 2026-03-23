@@ -13,6 +13,7 @@ namespace BusinessLogicTest
             ballLogic.CreateBalls(1);
             Assert.HasCount(1, ballLogic.Balls);
             Assert.AreEqual(typeof(Ball), ballLogic.Balls.ElementAt(0).GetType());
+            Assert.Contains(ballLogic.Balls.ElementAt(0), ballLogic.Balls);
         }
     }
 }
