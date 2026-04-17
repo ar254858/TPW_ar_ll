@@ -3,18 +3,17 @@ using Data;
 
 namespace PresentationModel
 {
-    public class BallModel
+    public class BallModel(BallLogic logic)
     {
-        private BallLogic Logic = new();
-        public void CreateBalls(int c)
+        public void CreateBalls(int c, int r)
         {
-            Logic = new();
-            Logic.CreateBalls(c);
+            logic.CreateBalls(c, r);
+            logic.StartMoving();
         }
 
         public List<Ball> GetBalls()
         {
-            return Logic.Balls;
+            return logic.Balls;
         }
     }
 }

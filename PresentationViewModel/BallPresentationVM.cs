@@ -1,19 +1,30 @@
 ﻿using System.Collections.ObjectModel;
 using PresentationModel;
 using Data;
+using System.Windows.Input;
 
 namespace PresentationViewModel
 {
     public class BallPresentationVM
     {
-        public BallModel model { get; } = new();
+        private BallModel _model;
         public ObservableCollection<Ball> Balls { get; } = new();
+        public ICommand CreateBallsCommand { get; }
+        public int SelectedBallCount { get; set; } = 5;
+        public int SelectedBallRadius { get; set; } = 5;
 
-        public void Generate(int count)
+        public BallPresentationVM(BallModel model)
         {
-            model.CreateBalls(count);
+            _model = model;
+            CreateBallsCommand = new RelayCommand(_ => Generate());
+        }
+        public void Generate()
+        {
+            int count = SelectedBallCount;
+            int radius = SelectedBallRadius;
+            _model.CreateBalls(count, radius);
             Balls.Clear();
-            foreach (var b in model.GetBalls())
+            foreach (var b in _model.GetBalls())
             {
                 Balls.Add(b);
             }
