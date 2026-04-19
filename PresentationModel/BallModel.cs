@@ -3,7 +3,7 @@ using Data;
 
 namespace PresentationModel
 {
-    public class BallModel(BallLogic logic)
+    public class BallModel(IBallLogic logic)
     {
         public void CreateBalls(int c, int r)
         {

@@ -1,17 +1,22 @@
-﻿using PresentationModel;
+﻿using BusinessLogic;
+using Data;
+using PresentationModel;
 
 namespace PresentationModelTest
 {
     [TestClass]
-    public sealed class Test1
+    public class BallModelTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void Test()
         {
-            BallModel model = new BallModel();
-            model.CreateBalls(10);
-            model.CreateBalls(2);
-            Assert.HasCount(2, model.GetBalls());
+            var mockLogic = new MockBallLogic();
+            var model = new BallModel(mockLogic);
+
+            model.CreateBalls(5, 10);
+
+            Assert.IsTrue(mockLogic.CreateBallsCalled);
+            Assert.IsTrue(mockLogic.StartMovingCalled);
         }
     }
 }

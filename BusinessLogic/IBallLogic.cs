@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BusinessLogic
 {
-    internal interface IBallLogic
+    public interface IBallLogic
     {
         List<Ball> Balls { get;}
         void CreateBalls(int c, int r);

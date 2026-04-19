@@ -52,7 +52,7 @@ namespace BusinessLogic
             _isMoving = false;
         }
 
-        private void MoveBalls()
+        public void MoveBalls()
         {
             foreach (var ball in Balls)
             {

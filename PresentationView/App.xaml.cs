@@ -14,8 +14,8 @@ namespace PresentationView
         public App()
         {
             var services = new ServiceCollection();
-            
-            services.AddSingleton<BallLogic>(); 
+
+            services.AddSingleton<IBallLogic, BallLogic>();
             services.AddSingleton<BallModel>();
             services.AddSingleton<BallPresentationVM>();
             services.AddTransient<MainWindow>();
