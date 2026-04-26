@@ -1,4 +1,5 @@
 ﻿using BusinessLogic;
+using Data;
 using PresentationModel;
 using PresentationViewModel;
 
@@ -10,9 +11,10 @@ namespace PresentationView
 
         public ViewModelLocator()
         {
-            IBallLogic ballLogic = new BallLogic();
-            BallModel ballModel = new BallModel(ballLogic);
+            DataApi dataApi = DataApi.CreateApi();
+            LogicApi logicApi = LogicApi.CreateApi(dataApi);
 
+            BallModel ballModel = new BallModel(logicApi);
             MainViewModel = new BallPresentationVM(ballModel);
         }
     }

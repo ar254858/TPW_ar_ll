@@ -3,7 +3,7 @@ using Data;
 
 namespace PresentationModel
 {
-    public class BallModel(IBallLogic logic)
+    public class BallModel(LogicApi logic)
     {
         public void CreateBalls(int c, int r)
         {
@@ -11,7 +11,7 @@ namespace PresentationModel
             logic.StartMoving();
         }
 
-        public List<Ball> GetBalls()
+        public IEnumerable<IBall> GetBalls()
         {
             return logic.Balls;
         }

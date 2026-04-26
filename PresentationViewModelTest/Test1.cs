@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using BusinessLogic;
+using Data;
 using PresentationModel;
 using PresentationViewModel;
 
@@ -8,36 +9,31 @@ namespace PresentationViewModelTest
     public class BallPresentationVMTests
     {
         [TestMethod]
-        public void CorrectModelMethods()
+        public void CreateBallsTest()
         {
-            var mockLogic = new MockBallLogic();
-            mockLogic.Balls.Add(new Ball(1, 2, 5));
-            mockLogic.Balls.Add(new Ball(2, 3, 5));
-            mockLogic.Balls.Add(new Ball(3, 4, 5));
-            var model = new BallModel(mockLogic);
-            var vm = new BallPresentationVM(model);
+            DataApi data = DataApi.CreateApi();
+            LogicApi logic = LogicApi.CreateApi(data);
+            BallModel model = new BallModel(logic);
+            BallPresentationVM vm = new BallPresentationVM(model);
 
-            vm.SelectedBallCount = 3;
+            int expectedCount = 3;
+            vm.SelectedBallCount = expectedCount;
             vm.CreateBallsCommand.Execute(null);
-
-            Assert.HasCount(3, vm.Balls);
-            Assert.IsTrue(mockLogic.CreateBallsCalled);
+            Assert.HasCount(expectedCount, vm.Balls);
+            Assert.IsNotNull(vm.Balls.FirstOrDefault());
         }
         [TestMethod]
-        public void RelayCommandExecuteAction()
+        public void RelayComExecuteTest()
         {
             bool wasExecuted = false;
             var command = new RelayCommand(_ => wasExecuted = true);
-
             command.Execute(null);
             Assert.IsTrue(wasExecuted);
         }
-
         [TestMethod]
-        public void RelayCommand_CanExecute_ShouldReturnPredicateResult()
+        public void ReturnPredicateTest()
         {
             var command = new RelayCommand(_ => { }, _ => false);
-
             bool canExecute = command.CanExecute(null);
             Assert.IsFalse(canExecute);
         }

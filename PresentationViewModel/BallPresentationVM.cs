@@ -8,7 +8,7 @@ namespace PresentationViewModel
     public class BallPresentationVM
     {
         private BallModel _model;
-        public ObservableCollection<Ball> Balls { get; } = new();
+        public ObservableCollection<IBall> Balls { get; } = new();
         public ICommand CreateBallsCommand { get; }
         public int SelectedBallCount { get; set; } = 5;
         public int SelectedBallRadius { get; set; } = 5;
