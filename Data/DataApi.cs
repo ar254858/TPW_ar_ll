@@ -8,7 +8,6 @@ namespace Data
     {
         public abstract IBall CreateBall(int x, int y, int radius);
         public abstract IEnumerable<IBall> GetBalls();
-        public abstract void MoveBalls();
         public abstract int Width { get; }
         public abstract int Height { get; }
         public static DataApi CreateApi() => new DataLayer(900, 600);
@@ -34,12 +33,5 @@ namespace Data
 
         public override IEnumerable<IBall> GetBalls() => _balls;
 
-        public override void MoveBalls()
-        {
-            foreach (var ball in _balls)
-            {
-                ball.Move(Width, Height);
-            }
-        }
     }
 }

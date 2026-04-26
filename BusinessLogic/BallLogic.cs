@@ -50,8 +50,40 @@ namespace BusinessLogic
         public override void StopMoving() => _isMoving = false;
 
         private void MoveBalls()
-        {
-            _dataApi.MoveBalls();
+        {   
+            foreach (IBall ball in _balls)
+            {
+                int newX = ball.X + ball.Xspeed;
+                int newY = ball.Y + ball.Yspeed;
+                int newXspeed = ball.Xspeed;
+                int newYspeed = ball.Yspeed;
+                int D = ball.D;
+                if (newX <= 0)
+                {
+                    newX = 0;
+                    newXspeed = -newXspeed;
+                }
+                else if (newX + D >= _dataApi.Width)
+                {
+                    newX = _dataApi.Width - D;
+                    newXspeed = -newXspeed;
+                }
+
+                if (newY <= 0)
+                {
+                    newY = 0;
+                    newYspeed = -newYspeed;
+                }
+                else if (newY + D >= _dataApi.Height)
+                {
+                    newY = _dataApi.Height - D;
+                    newYspeed = -newYspeed;
+                }
+
+                ball.Move(newX, newY);
+                ball.ChangeSpeed(newXspeed, newYspeed);
+            }
+            
         }
     }
 }

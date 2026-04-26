@@ -11,6 +11,9 @@ namespace Data
         int Y { get; }
         int R { get; }
         int D { get; }
-        void Move(int maxWidth, int maxHeight);
+        int Xspeed { get; }
+        int Yspeed { get; }
+        void Move(int newX, int newY);
+        void ChangeSpeed(int newXSpeed, int newYSpeed);
     }
 }

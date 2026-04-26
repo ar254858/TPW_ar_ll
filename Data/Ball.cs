@@ -9,8 +9,8 @@ namespace Data
         public int Y { get; private set; }
         public int R { get; }
         public int D => R * 2;
-        internal int Xspeed { get; set; }
-        internal int Yspeed { get; set; }
+        public int Xspeed { get; set; }
+        public int Yspeed { get; set; }
 
         public Ball(int x, int y, int r)
         {
@@ -20,35 +20,18 @@ namespace Data
             Xspeed = 5;
             Yspeed = 5;
         }
-        public void Move(int maxWidth, int maxHeight)
+        public void Move(int newX, int newY)
         {
-            X += Xspeed;
-            Y += Yspeed;
-
-            if (X <= 0)
-            {
-                X = 0;
-                Xspeed = -Xspeed;
-            }
-            else if (X + D >= maxWidth)
-            {
-                X = maxWidth - D;
-                Xspeed = -Xspeed;
-            }
-
-            if (Y <= 0)
-            {
-                Y = 0;
-                Yspeed = -Yspeed;
-            }
-            else if (Y + D >= maxHeight)
-            {
-                Y = maxHeight - D;
-                Yspeed = -Yspeed;
-            }
+            X = newX;
+            Y = newY;
 
             OnPropertyChanged(nameof(X));
             OnPropertyChanged(nameof(Y));
+        }
+        public void ChangeSpeed(int newXSpeed, int newYSpeed)
+        {
+            Xspeed = newXSpeed;
+            Yspeed = newYSpeed;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
