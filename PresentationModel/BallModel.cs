@@ -1,5 +1,4 @@
 ﻿using BusinessLogic;
-using Data;
 
 namespace PresentationModel
 {
@@ -11,7 +10,7 @@ namespace PresentationModel
             logic.StartMoving();
         }
 
-        public IEnumerable<IBall> GetBalls()
+        public IEnumerable<Object> GetBalls()
         {
             return logic.Balls;
         }

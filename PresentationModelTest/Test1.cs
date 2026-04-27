@@ -19,7 +19,7 @@ namespace PresentationModelTest
 
             model.CreateBalls(count, radius);
             Assert.AreEqual(count, model.GetBalls().Count());
-            Assert.AreEqual(radius, model.GetBalls().First().R);
+            Assert.AreEqual(radius, ((IBall)model.GetBalls().First()).R);
         }
     }
 }

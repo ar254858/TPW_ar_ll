@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using PresentationModel;
-using Data;
 using System.Windows.Input;
 
 namespace PresentationViewModel
@@ -8,7 +7,7 @@ namespace PresentationViewModel
     public class BallPresentationVM
     {
         private BallModel _model;
-        public ObservableCollection<IBall> Balls { get; } = new();
+        public ObservableCollection<Object> Balls { get; } = new();
         public ICommand CreateBallsCommand { get; }
         public int SelectedBallCount { get; set; } = 5;
         public int SelectedBallRadius { get; set; } = 5;
