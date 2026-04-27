@@ -49,7 +49,7 @@ namespace BusinessLogic
 
         public override void StopMoving() => _isMoving = false;
 
-        private void MoveBalls()
+        public override void MoveBalls()
         {   
             foreach (IBall ball in _balls)
             {
