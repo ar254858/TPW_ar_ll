@@ -18,7 +18,7 @@ namespace Data
         public override int Width { get; }
         public override int Height { get; }
         private readonly List<IBall> _balls = new();
-
+        private int _nextId = 0;
         public DataLayer(int w, int h) { 
             Width = w; 
             Height = h; 
@@ -26,7 +26,7 @@ namespace Data
 
         public override IBall CreateBall(int x, int y, int r)
         {
-            var ball = new Ball(x, y, r);
+            var ball = new Ball(x, y, r, _nextId++);
             _balls.Add(ball);
             return ball;
         }

@@ -5,22 +5,26 @@ namespace Data
 {
     internal class Ball : IBall
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public int R { get; }
-        public int D => R * 2;
-        public int Xspeed { get; set; }
-        public int Yspeed { get; set; }
+        public double X { get; private set; }
+        public double Y { get; private set; }
+        public double R { get; }
+        public double D => R * 2;
+        public double Xspeed { get; set; }
+        public double Yspeed { get; set; }
+        public int Id { get; }
+        private readonly object _lockObject = new object();
+        public object LockObject => _lockObject;
 
-        public Ball(int x, int y, int r)
+        public Ball(double x, double y, double r, int id)
         {
+            Id = id;
             X = x;
             Y = y;
             R = r;
             Xspeed = 5;
             Yspeed = 5;
         }
-        public void Move(int newX, int newY)
+        public void Move(double newX, double newY)
         {
             X = newX;
             Y = newY;
@@ -28,7 +32,7 @@ namespace Data
             OnPropertyChanged(nameof(X));
             OnPropertyChanged(nameof(Y));
         }
-        public void ChangeSpeed(int newXSpeed, int newYSpeed)
+        public void ChangeSpeed(double newXSpeed, double newYSpeed)
         {
             Xspeed = newXSpeed;
             Yspeed = newYSpeed;

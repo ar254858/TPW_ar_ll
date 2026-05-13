@@ -7,13 +7,15 @@ namespace Data
 {
     public interface IBall : INotifyPropertyChanged
     {
-        int X { get; }
-        int Y { get; }
-        int R { get; }
-        int D { get; }
-        int Xspeed { get; }
-        int Yspeed { get; }
-        void Move(int newX, int newY);
-        void ChangeSpeed(int newXSpeed, int newYSpeed);
+        double X { get; }
+        double Y { get; }
+        double R { get; }
+        double D { get; }
+        double Xspeed { get; }
+        double Yspeed { get; }
+        int Id { get; }
+        object LockObject { get; }
+        void Move(double newX, double newY);
+        void ChangeSpeed(double newXSpeed, double newYSpeed);
     }
 }
