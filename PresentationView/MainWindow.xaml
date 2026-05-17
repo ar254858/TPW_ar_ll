@@ -33,7 +33,7 @@
            VerticalAlignment="Center" Width="20" />
         </StackPanel>
 
-        <Border Grid.Row="1" Width="900" Height="600" 
+        <Border Grid.Row="1" Width="904" Height="604" 
         BorderBrush="Black" BorderThickness="2" 
         HorizontalAlignment="Center" VerticalAlignment="Center">
 

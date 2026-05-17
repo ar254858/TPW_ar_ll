@@ -9,7 +9,7 @@ namespace BusinessLogic
     {
         private readonly List<IBall> _balls = new();
         public override IEnumerable<IBall> Balls => _balls;
-
+        private readonly object _ballsLock = new object();
         private readonly DataApi _dataApi;
         private bool _isMoving = false;
 
@@ -20,15 +20,18 @@ namespace BusinessLogic
 
         public override void CreateBalls(int c, int r)
         {
-            _balls.Clear();
-            Random rng = new Random();
-
-            for (int i = 0; i < c; i++)
+            lock (_ballsLock)
             {
-                int startX = rng.Next(10, _dataApi.Width - 30);
-                int startY = rng.Next(10, _dataApi.Height - 30);
-                IBall ball = _dataApi.CreateBall(startX, startY, r);
-                _balls.Add(ball);
+                _balls.Clear();
+                Random rng = new Random();
+
+                for (int i = 0; i < c; i++)
+                {
+                    int startX = rng.Next(10, _dataApi.Width - 30);
+                    int startY = rng.Next(10, _dataApi.Height - 30);
+                    IBall ball = _dataApi.CreateBall(startX, startY, r);
+                    _balls.Add(ball);
+                }
             }
         }
 
@@ -94,68 +97,85 @@ namespace BusinessLogic
             {
                 double moveX = (overlap / 2) * nx;
                 double moveY = (overlap / 2) * ny;
-                b1.Move((b1.X - moveX), (b1.Y - moveY));
-                b2.Move((b2.X + moveX), (b2.Y + moveY));
+
+                double newB1X = b1.X - moveX;
+                double newB1Y = b1.Y - moveY;
+                double newB2X = b2.X + moveX;
+                double newB2Y = b2.Y + moveY;
+
+                newB1X = Math.Max(0, Math.Min(newB1X, _dataApi.Width - b1.D));
+                newB1Y = Math.Max(0, Math.Min(newB1Y, _dataApi.Height - b1.D));
+                newB2X = Math.Max(0, Math.Min(newB2X, _dataApi.Width - b2.D));
+                newB2Y = Math.Max(0, Math.Min(newB2Y, _dataApi.Height - b2.D));
+
+                b1.Move(newB1X, newB1Y);
+                b2.Move(newB2X, newB2Y);
             }
         }
 
         public override void MoveBalls()
         {
-            foreach (IBall ball in _balls)
+            lock (_ballsLock)
             {
-                lock (ball.LockObject)
+                Parallel.ForEach(_balls, ball =>
                 {
-                    double newX = ball.X + ball.Xspeed;
-                    double newY = ball.Y + ball.Yspeed;
-                    double newXspeed = ball.Xspeed;
-                    double newYspeed = ball.Yspeed;
-                    double D = ball.D;
-                    if (newX <= 0)
+                    lock (ball.LockObject)
                     {
-                        newX = 0;
-                        newXspeed = -newXspeed;
-                    }
-                    else if (newX + D >= _dataApi.Width)
-                    {
-                        newX = _dataApi.Width - D;
-                        newXspeed = -newXspeed;
-                    }
-
-                    if (newY <= 0)
-                    {
-                        newY = 0;
-                        newYspeed = -newYspeed;
-                    }
-                    else if (newY + D >= _dataApi.Height)
-                    {
-                        newY = _dataApi.Height - D;
-                        newYspeed = -newYspeed;
-                    }
-
-                    ball.Move(newX, newY);
-                    ball.ChangeSpeed(newXspeed, newYspeed);
-                }
-            }
-            for (int i = 0; i < _balls.Count; i++)
-            {
-                for (int j = i + 1; j < _balls.Count; j++)
-                {
-                    IBall b1 = _balls[i];
-                    IBall b2 = _balls[j];
-                    IBall firstLock = b1.Id < b2.Id ? b1 : b2;
-                    IBall secondLock = b1.Id < b2.Id ? b2 : b1;
-
-                    lock (firstLock.LockObject)
-                    {
-                        lock (secondLock.LockObject)
+                        double newX = ball.X + ball.Xspeed;
+                        double newY = ball.Y + ball.Yspeed;
+                        double newXspeed = ball.Xspeed;
+                        double newYspeed = ball.Yspeed;
+                        double D = ball.D;
+                        if (newX <= 0)
                         {
-                            if (IsCollision(b1, b2))
+                            newX = 0;
+                            newXspeed = -newXspeed;
+                        }
+                        else if (newX + D >= _dataApi.Width)
+                        {
+                            newX = _dataApi.Width - D;
+                            newXspeed = -newXspeed;
+                        }
+
+                        if (newY <= 0)
+                        {
+                            newY = 0;
+                            newYspeed = -newYspeed;
+                        }
+                        else if (newY + D >= _dataApi.Height)
+                        {
+                            newY = _dataApi.Height - D;
+                            newYspeed = -newYspeed;
+                        }
+
+                        ball.Move(newX, newY);
+                        ball.ChangeSpeed(newXspeed, newYspeed);
+                    }
+                });
+                Parallel.For(0, _balls.Count, i =>
+                {
+                    for (int j = i + 1; j < _balls.Count; j++)
+                    {
+                        IBall b1 = _balls[i];
+                        IBall b2 = _balls[j];
+                        if (IsCollision(b1, b2)) // sprawdzenie kolizji przed zablokowaniem, aby unikać niepotrzebnych blokad
+                        {
+                            IBall firstLock = b1.Id < b2.Id ? b1 : b2;
+                            IBall secondLock = b1.Id < b2.Id ? b2 : b1;
+
+                            lock (firstLock.LockObject)
                             {
-                                HandleCollision(b1, b2);
+                                lock (secondLock.LockObject)
+                                {
+                                    if (IsCollision(b1, b2)) // ponowne sprawdzenie kolizji po zablokowaniu
+                                    {
+                                        HandleCollision(b1, b2);
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                });
             }
         }
 
