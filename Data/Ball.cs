@@ -21,8 +21,8 @@ namespace Data
             X = x;
             Y = y;
             R = r;
-            Xspeed = 5;
-            Yspeed = 5;
+            Xspeed = 180;
+            Yspeed = 180;
         }
         public void Move(double newX, double newY)
         {

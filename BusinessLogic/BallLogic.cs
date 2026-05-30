@@ -1,7 +1,8 @@
 ﻿using Data;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
+using System.Timers;
 
 namespace BusinessLogic
 {
@@ -11,11 +12,19 @@ namespace BusinessLogic
         public override IEnumerable<IBall> Balls => _balls;
         private readonly object _ballsLock = new object();
         private readonly DataApi _dataApi;
+        private readonly ILogger _logger;
         private bool _isMoving = false;
 
-        public BallLogic(DataApi dataApi)
+        private System.Timers.Timer _timer;
+        private DateTime _lastTickTime;
+        private int _frameCounter;
+        private double _accumulator = 0.0;
+        private readonly double _fixedDeltaTime = 0.016;
+
+        public BallLogic(DataApi dataApi, ILogger logger)
         {
             _dataApi = dataApi;
+            _logger = logger;
         }
 
         public override void CreateBalls(int c, int r)
@@ -35,22 +44,76 @@ namespace BusinessLogic
             }
         }
 
+        private void OnTimerTick(object sender, ElapsedEventArgs e)
+        {
+            if (!_isMoving) return;
+
+            //if (_frameCounter > 0 && _frameCounter % 150 == 0) // odkomentuj to lukaszu wraz z linijka 65, fajny efekt (nie dawaj duzo kul)
+            //{
+            //    _lastTickTime = _lastTickTime.AddMilliseconds(-200);
+            //}
+
+            DateTime now = DateTime.Now;
+            double frameTime = (now - _lastTickTime).TotalSeconds;
+            _lastTickTime = now;
+            _accumulator += frameTime;
+
+            while (_accumulator >= _fixedDeltaTime)
+            {
+                MoveBalls(_fixedDeltaTime);
+                _accumulator -= _fixedDeltaTime;
+                //System.Threading.Thread.Sleep(20);
+            }
+
+            if (_frameCounter % 30 == 0)
+            {
+                var serializedData = _balls.Select(b => new
+                {
+                    Id = b.Id,
+                    X = b.X,
+                    Y = b.Y,
+                    Xspeed = b.Xspeed,
+                    Yspeed = b.Yspeed
+                }).ToList();
+                _logger.LogData(serializedData);
+            }
+
+            _frameCounter++;
+        }
+
         public override void StartMoving()
         {
+            if (_balls.Count == 0) return;
             if (_isMoving) return;
             _isMoving = true;
 
-            Task.Run(async () =>
+            var initialData = new
             {
-                while (_isMoving)
-                {
-                    MoveBalls();
-                    await Task.Delay(16); //1000ms / 16 ms = 60 FPS
-                }
-            });
+                BallCount = _balls.Count,
+                BallRadius = _balls[0].R,
+                AreaWidth = _dataApi.Width,
+                AreaHeight = _dataApi.Height
+            };
+            _logger.LogData(initialData);
+
+            _frameCounter = 0;
+            _lastTickTime = DateTime.Now;
+            _timer = new System.Timers.Timer(16);
+            _timer.Elapsed += OnTimerTick;
+            _timer.AutoReset = true;
+            _timer.Start();
         }
 
-        public override void StopMoving() => _isMoving = false;
+        public override void StopMoving()
+        {
+            _isMoving = false;
+
+            if (_timer != null)
+            {
+                _timer.Stop();
+                _timer.Dispose();
+            }
+        }
 
         private bool IsCollision(IBall b1, IBall b2)
         {
@@ -59,7 +122,7 @@ namespace BusinessLogic
             double distanceSquared = dx * dx + dy * dy;
 
             double minDistance = b1.R + b2.R;
-            return distanceSquared <= minDistance * minDistance; //nie obciazamy cpu pierwiastkiem
+            return distanceSquared <= minDistance * minDistance;
         }
 
         private void HandleCollision(IBall b1, IBall b2)
@@ -85,7 +148,7 @@ namespace BusinessLogic
             double newX2 = b2.Xspeed + impulse * nx;
             double newY2 = b2.Yspeed + impulse * ny;
 
-            double targetSpeed = 5.0;
+            double targetSpeed = 180.0;
 
             double currentSpeed1 = Math.Sqrt(newX1 * newX1 + newY1 * newY1);
             b1.ChangeSpeed((newX1 / currentSpeed1 * targetSpeed), (newY1 / currentSpeed1 * targetSpeed));
@@ -113,7 +176,7 @@ namespace BusinessLogic
             }
         }
 
-        public override void MoveBalls()
+        public override void MoveBalls(double deltaTime)
         {
             lock (_ballsLock)
             {
@@ -121,8 +184,8 @@ namespace BusinessLogic
                 {
                     lock (ball.LockObject)
                     {
-                        double newX = ball.X + ball.Xspeed;
-                        double newY = ball.Y + ball.Yspeed;
+                        double newX = ball.X + ball.Xspeed * deltaTime;
+                        double newY = ball.Y + ball.Yspeed * deltaTime;
                         double newXspeed = ball.Xspeed;
                         double newYspeed = ball.Yspeed;
                         double D = ball.D;
@@ -178,6 +241,7 @@ namespace BusinessLogic
                 });
             }
         }
+
 
 
     }
