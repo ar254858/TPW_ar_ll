@@ -4,6 +4,11 @@ using PresentationModel;
 
 namespace PresentationModelTest
 {
+    public class MockLogger : ILogger
+    {
+        public void LogData(object data) {}
+        public void Stop() {}
+    }
     [TestClass]
     public class BallModelTests
     {
@@ -11,7 +16,8 @@ namespace PresentationModelTest
         public void LogicAndDataShouldWorkTest()
         {
             DataApi data = DataApi.CreateApi();
-            LogicApi logic = LogicApi.CreateApi(data);
+            MockLogger logger = new MockLogger();
+            LogicApi logic = LogicApi.CreateApi(data, logger);
             BallModel model = new BallModel(logic);
 
             int count = 5;

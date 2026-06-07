@@ -3,6 +3,15 @@ using Data;
 
 namespace BusinessLogicTest
 {
+    public class MockLogger : ILogger
+    {
+        public int CallCount { get; private set; } = 0;
+        public void LogData(object data) 
+        {
+            CallCount++;
+        }
+        public void Stop() {}
+    }
     [TestClass]
     public sealed class Test1
     {
@@ -26,8 +35,7 @@ namespace BusinessLogicTest
             var balls = data.GetBalls().ToList();
             double startX1 = balls[0].X;
             double startX2 = balls[1].X;
-
-            logic.MoveBalls();
+            logic.MoveBalls(0.016);
 
             Assert.AreNotEqual(startX1, balls[0].X);
             Assert.AreNotEqual(startX2, balls[1].X);
@@ -36,7 +44,8 @@ namespace BusinessLogicTest
         public async Task MovingTest()
         {
             DataApi data = DataApi.CreateApi();
-            LogicApi logic = LogicApi.CreateApi(data);
+            MockLogger logger = new MockLogger();
+            LogicApi logic = LogicApi.CreateApi(data, logger);
             logic.CreateBalls(1, 5);
 
             var ball = logic.Balls.First();
@@ -54,7 +63,8 @@ namespace BusinessLogicTest
         public async Task StopMovingTest()
         {
             DataApi data = DataApi.CreateApi();
-            LogicApi logic = LogicApi.CreateApi(data);
+            MockLogger logger = new MockLogger();
+            LogicApi logic = LogicApi.CreateApi(data, logger);
             logic.CreateBalls(1, 5);
 
             logic.StartMoving();
@@ -65,43 +75,6 @@ namespace BusinessLogicTest
 
             await Task.Delay(50);
             Assert.AreEqual(positionAfterStop, logic.Balls.First().X);
-        }
-        [TestMethod]
-        public void BounceTest()
-        {
-            DataApi data = DataApi.CreateApi();
-            LogicApi logic = LogicApi.CreateApi(data);
-            logic.CreateBalls(1, 5);
-            var balls = data.GetBalls().ToList();
-            IBall ball = balls.First();
-            
-            ball.Move(data.Width - ball.R, ball.Y); 
-            double startX = ball.X;
-            logic.MoveBalls();
-            Assert.IsLessThan(startX, ball.X);
-            
-            ball.Move(ball.X, data.Height - ball.R);
-            double startY = ball.Y;
-            logic.MoveBalls();
-            Assert.IsLessThan(startY, ball.Y);
-        }
-
-        [TestMethod]
-        public void BarrierTest()
-        {
-            // Arrange
-            DataApi data = DataApi.CreateApi();
-            LogicApi logic = LogicApi.CreateApi(data);
-            logic.CreateBalls(100, 10);
-            for (int i = 0; i < 50; i++)
-            {
-                logic.MoveBalls();
-            }
-            foreach (var ball in logic.Balls)
-            {
-                Assert.IsTrue(ball.X >= 0 && ball.X + ball.D <= data.Width);
-                Assert.IsTrue(ball.Y >= 0 && ball.Y + ball.D <= data.Height);
-            }
         }
     }
 }

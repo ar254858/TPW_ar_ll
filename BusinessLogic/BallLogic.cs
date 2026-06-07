@@ -48,11 +48,6 @@ namespace BusinessLogic
         {
             if (!_isMoving) return;
 
-            //if (_frameCounter > 0 && _frameCounter % 150 == 0) // odkomentuj to lukaszu wraz z linijka 65, fajny efekt (nie dawaj duzo kul)
-            //{
-            //    _lastTickTime = _lastTickTime.AddMilliseconds(-200);
-            //}
-
             DateTime now = DateTime.Now;
             double frameTime = (now - _lastTickTime).TotalSeconds;
             _lastTickTime = now;
@@ -62,7 +57,6 @@ namespace BusinessLogic
             {
                 MoveBalls(_fixedDeltaTime);
                 _accumulator -= _fixedDeltaTime;
-                //System.Threading.Thread.Sleep(20);
             }
 
             if (_frameCounter % 30 == 0)

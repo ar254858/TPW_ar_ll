@@ -15,7 +15,7 @@ namespace Data
 
         private const int MaxLogFiles = 20;
 
-        public ASCIILogger()
+        public ASCIILogger(string customLogDir = null)
         {
             _logFilePath = InitializeEnvironment();
 
