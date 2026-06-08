@@ -20,6 +20,7 @@ namespace BusinessLogic
         private int _frameCounter;
         private double _accumulator = 0.0;
         private readonly double _fixedDeltaTime = 0.016;
+        private int _isProcessing = 0;
 
         public BallLogic(DataApi dataApi, ILogger logger)
         {
@@ -48,33 +49,44 @@ namespace BusinessLogic
         {
             if (!_isMoving) return;
 
-            DateTime now = DateTime.Now;
-            double frameTime = (now - _lastTickTime).TotalSeconds;
-            _lastTickTime = now;
-            _accumulator += frameTime;
-
-            while (_accumulator >= _fixedDeltaTime)
+            if (Interlocked.CompareExchange(ref _isProcessing, 1, 0) == 1)
+                return;
+            try
             {
-                MoveBalls(_fixedDeltaTime);
-                _accumulator -= _fixedDeltaTime;
-            }
+                DateTime now = DateTime.Now;
+                double frameTime = (now - _lastTickTime).TotalSeconds;
+                _lastTickTime = now;
+                _accumulator += frameTime;
 
-            if (_frameCounter % 30 == 0)
-            {
-                var serializedData = _balls.Select(b => new
+                while (_accumulator >= _fixedDeltaTime)
                 {
-                    Id = b.Id,
-                    X = b.X,
-                    Y = b.Y,
-                    Xspeed = b.Xspeed,
-                    Yspeed = b.Yspeed
-                }).ToList();
-                _logger.LogData(serializedData);
+                    MoveBalls(_fixedDeltaTime);
+                    _accumulator -= _fixedDeltaTime;
+                }
+
+                if (_frameCounter % 30 == 0)
+                {
+                    lock (_ballsLock)
+                    {
+                        var serializedData = _balls.Select(b => new
+                        {
+                            Id = b.Id,
+                            X = b.X,
+                            Y = b.Y,
+                            Xspeed = b.Xspeed,
+                            Yspeed = b.Yspeed
+                        }).ToList();
+                        _logger.LogData(serializedData);
+                    }
+                }
+
+                _frameCounter++;
             }
-
-            _frameCounter++;
+            finally
+            {
+                Interlocked.Exchange(ref _isProcessing, 0);
+            }
         }
-
         public override void StartMoving()
         {
             if (_balls.Count == 0) return;
@@ -217,7 +229,6 @@ namespace BusinessLogic
                         IBall b2 = _balls[j];
                         IBall firstLock = b1.Id < b2.Id ? b1 : b2;
                         IBall secondLock = b1.Id < b2.Id ? b2 : b1;
-
                         lock (firstLock.LockObject)
                         {
                             lock (secondLock.LockObject)
