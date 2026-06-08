@@ -23,5 +23,23 @@ namespace DataTest
             Assert.AreEqual(900, data.Width);
             Assert.AreEqual(600, data.Height);
         }
+        [TestMethod]
+        public void LoggerTest()
+        {
+            string testDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestLogs");
+            ILogger logger = new ASCIILogger(testDir);
+            var testData = new { Value = 42 };
+
+            logger.LogData(testData);
+            logger.Stop();
+
+            var directoryInfo = new DirectoryInfo(testDir);
+            var latestFile = directoryInfo.GetFiles("ball_log_*.txt").OrderByDescending(f => f.CreationTime).First();
+            string content = File.ReadAllText(latestFile.FullName);
+
+            Assert.Contains("\"Value\":42", content);
+            Directory.Delete(testDir, true);
+        }
+
     }
 }

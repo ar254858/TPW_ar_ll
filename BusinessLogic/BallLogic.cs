@@ -215,19 +215,16 @@ namespace BusinessLogic
                     {
                         IBall b1 = _balls[i];
                         IBall b2 = _balls[j];
-                        if (IsCollision(b1, b2)) // sprawdzenie kolizji przed zablokowaniem, aby unikać niepotrzebnych blokad
-                        {
-                            IBall firstLock = b1.Id < b2.Id ? b1 : b2;
-                            IBall secondLock = b1.Id < b2.Id ? b2 : b1;
+                        IBall firstLock = b1.Id < b2.Id ? b1 : b2;
+                        IBall secondLock = b1.Id < b2.Id ? b2 : b1;
 
-                            lock (firstLock.LockObject)
+                        lock (firstLock.LockObject)
+                        {
+                            lock (secondLock.LockObject)
                             {
-                                lock (secondLock.LockObject)
+                                if (IsCollision(b1, b2)) 
                                 {
-                                    if (IsCollision(b1, b2)) // ponowne sprawdzenie kolizji po zablokowaniu
-                                    {
-                                        HandleCollision(b1, b2);
-                                    }
+                                    HandleCollision(b1, b2);
                                 }
                             }
                         }

@@ -17,18 +17,25 @@ namespace Data
 
         public ASCIILogger(string customLogDir = null)
         {
-            _logFilePath = InitializeEnvironment();
-
+            _logFilePath = InitializeEnvironment(customLogDir);
             _logQueue = new BlockingCollection<string>();
             _loggingTask = Task.Run(ProcessQueue);
         }
 
-        private string InitializeEnvironment()
+        private string InitializeEnvironment(string customLogDir)
         {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string logDir = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\logs"));
-            Directory.CreateDirectory(logDir);
+            string logDir;
+            if (string.IsNullOrEmpty(customLogDir))
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                logDir = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\logs"));
+            }
+            else
+            {
+                logDir = customLogDir;
+            }
 
+            Directory.CreateDirectory(logDir);
             ApplyLogRotation(logDir);
 
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
