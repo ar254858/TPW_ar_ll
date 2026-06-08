@@ -87,6 +87,7 @@ namespace BusinessLogic
                 Interlocked.Exchange(ref _isProcessing, 0);
             }
         }
+
         public override void StartMoving()
         {
             if (_balls.Count == 0) return;
@@ -103,6 +104,8 @@ namespace BusinessLogic
             _logger.LogData(initialData);
 
             _frameCounter = 0;
+            _accumulator = 0.0;
+            Interlocked.Exchange(ref _isProcessing, 0);
             _lastTickTime = DateTime.Now;
             _timer = new System.Timers.Timer(16);
             _timer.Elapsed += OnTimerTick;

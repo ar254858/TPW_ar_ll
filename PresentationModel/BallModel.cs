@@ -6,6 +6,7 @@ namespace PresentationModel
     {
         public void CreateBalls(int c, int r)
         {
+            logic.StopMoving();
             logic.CreateBalls(c, r);
             logic.StartMoving();
         }
